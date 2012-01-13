@@ -45,6 +45,10 @@
 #include "quartz/gdkquartz.h"
 #endif
 
+#ifdef GDK_WINDOWING_WAYLAND
+#include "wayland/gdkwayland.h"
+#endif
+
 #undef GDK_DEPRECATED
 #undef GDK_DEPRECATED_FOR
 #define GDK_DEPRECATED

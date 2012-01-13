@@ -31,13 +31,6 @@
 typedef struct _GdkScreenWayland      GdkScreenWayland;
 typedef struct _GdkScreenWaylandClass GdkScreenWaylandClass;
 
-#define GDK_TYPE_SCREEN_WAYLAND              (_gdk_screen_wayland_get_type ())
-#define GDK_SCREEN_WAYLAND(object)           (G_TYPE_CHECK_INSTANCE_CAST ((object), GDK_TYPE_SCREEN_WAYLAND, GdkScreenWayland))
-#define GDK_SCREEN_WAYLAND_CLASS(klass)      (G_TYPE_CHECK_CLASS_CAST ((klass), GDK_TYPE_SCREEN_WAYLAND, GdkScreenWaylandClass))
-#define GDK_IS_SCREEN_WAYLAND(object)        (G_TYPE_CHECK_INSTANCE_TYPE ((object), GDK_TYPE_SCREEN_WAYLAND))
-#define GDK_IS_SCREEN_WAYLAND_CLASS(klass)   (G_TYPE_CHECK_CLASS_TYPE ((klass), GDK_TYPE_SCREEN_WAYLAND))
-#define GDK_SCREEN_WAYLAND_GET_CLASS(obj)    (G_TYPE_INSTANCE_GET_CLASS ((obj), GDK_TYPE_SCREEN_WAYLAND, GdkScreenWaylandClass))
-
 typedef struct _GdkWaylandMonitor GdkWaylandMonitor;
 
 struct _GdkScreenWayland
@@ -75,7 +68,7 @@ struct _GdkWaylandMonitor
   char *	manufacturer;
 };
 
-G_DEFINE_TYPE (GdkScreenWayland, _gdk_screen_wayland, GDK_TYPE_SCREEN)
+G_DEFINE_TYPE (GdkScreenWayland, gdk_screen_wayland, GDK_TYPE_SCREEN)
 
 static void
 init_monitor_geometry (GdkWaylandMonitor *monitor,
@@ -140,7 +133,7 @@ gdk_wayland_screen_dispose (GObject *object)
   if (screen_wayland->root_window)
     _gdk_window_destroy (screen_wayland->root_window, TRUE);
 
-  G_OBJECT_CLASS (_gdk_screen_wayland_parent_class)->dispose (object);
+  G_OBJECT_CLASS (gdk_screen_wayland_parent_class)->dispose (object);
 }
 
 static void
@@ -155,7 +148,7 @@ gdk_wayland_screen_finalize (GObject *object)
 
   deinit_multihead (GDK_SCREEN (object));
 
-  G_OBJECT_CLASS (_gdk_screen_wayland_parent_class)->finalize (object);
+  G_OBJECT_CLASS (gdk_screen_wayland_parent_class)->finalize (object);
 }
 
 static GdkDisplay *
@@ -443,7 +436,7 @@ _gdk_wayland_screen_new (GdkDisplay *display)
 }
 
 static void
-_gdk_screen_wayland_class_init (GdkScreenWaylandClass *klass)
+gdk_screen_wayland_class_init (GdkScreenWaylandClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
   GdkScreenClass *screen_class = GDK_SCREEN_CLASS (klass);
@@ -485,6 +478,6 @@ _gdk_screen_wayland_class_init (GdkScreenWaylandClass *klass)
 }
 
 static void
-_gdk_screen_wayland_init (GdkScreenWayland *screen_wayland)
+gdk_screen_wayland_init (GdkScreenWayland *screen_wayland)
 {
 }

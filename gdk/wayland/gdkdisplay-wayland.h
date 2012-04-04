@@ -2,8 +2,11 @@
  * gdkdisplay-wayland.h
  * 
  * Copyright 2001 Sun Microsystems Inc. 
+ * Copyright 2011 - 2012 Intel Corporation
  *
- * Erwann Chenede <erwann.chenede@sun.com>
+ * Authors: Erwann Chenede <erwann.chenede@sun.com>
+ *          Kristian Høgsberg <krh@bitplanet.net>
+ *          Rob Bradford <rob@linux.intel.com>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public

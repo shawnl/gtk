@@ -391,6 +391,9 @@ if test "x$enable_wayland_backend" == "xyes"; then
     cairo_backends="$cairo_backends cairo-gl"
     AC_DEFINE(GDK_WAYLAND_USE_EGL, true,
               [Whether to use EGL in Wayland backend])
+  else
+    # For the cairo image backend
+    cairo_backends="$cairo_backends cairo"
   fi
   GDK_BACKENDS="$GDK_BACKENDS wayland"
   GIO_PACKAGE=gio-unix-2.0

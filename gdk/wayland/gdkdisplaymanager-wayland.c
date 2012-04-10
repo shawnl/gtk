@@ -28,7 +28,7 @@
 
 #include "gdkinternals.h"
 
-#include <X11/extensions/XKBcommon.h>
+#include <xkbcommon/xkbcommon.h>
 
 typedef struct _GdkWaylandDisplayManager GdkWaylandDisplayManager;
 typedef struct _GdkWaylandDisplayManagerClass GdkWaylandDisplayManagerClass;

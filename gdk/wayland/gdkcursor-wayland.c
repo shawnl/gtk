@@ -169,6 +169,7 @@ create_cursor(GdkDisplayWayland *display, GdkPixbuf *pixbuf, int x, int y)
   int stride, fd;
   char *filename;
   GError *error = NULL;
+  struct wl_shm_pool *pool;
 
   cursor = g_object_new (GDK_TYPE_WAYLAND_CURSOR,
 			 "cursor-type", GDK_CURSOR_IS_PIXMAP,
@@ -221,13 +222,13 @@ create_cursor(GdkDisplayWayland *display, GdkPixbuf *pixbuf, int x, int y)
   else
     memset (cursor->map, 0, 4);
 
-  cursor->buffer = wl_shm_create_buffer(display->shm,
-					fd,
-					cursor->width,
-					cursor->height,
-					stride, WL_SHM_FORMAT_ARGB8888);
-
+  pool = wl_shm_create_pool(display->shm, fd, cursor->size);
   close(fd);
+
+  cursor->buffer = wl_shm_pool_create_buffer(pool, 0,
+			cursor->width, cursor->height, stride,
+			WL_SHM_FORMAT_XRGB8888);
+  wl_shm_pool_destroy(pool);
 
   return GDK_CURSOR (cursor);
 }

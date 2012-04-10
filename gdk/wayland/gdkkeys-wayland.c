@@ -39,7 +39,7 @@
 #include "gdkdisplay-wayland.h"
 #include "gdkkeysprivate.h"
 
-#include <X11/extensions/XKBcommon.h>
+#include <xkbcommon/xkbcommon.h>
 
 typedef struct _GdkWaylandKeymap          GdkWaylandKeymap;
 typedef struct _GdkWaylandKeymapClass     GdkWaylandKeymapClass;
@@ -278,7 +278,7 @@ gdk_wayland_keymap_lookup_key (GdkKeymap          *keymap,
  */
 static int
 MyEnhancedXkbTranslateKeyCode(struct xkb_desc *       xkb,
-                              KeyCode                 key,
+                              xkb_keycode_t           key,
                               unsigned int            mods,
                               unsigned int *          mods_rtrn,
                               uint32_t *              keysym_rtrn,
@@ -322,7 +322,7 @@ MyEnhancedXkbTranslateKeyCode(struct xkb_desc *       xkb,
         }
     }
     col= effectiveGroup*XkbKeyGroupsWidth(xkb,key);
-    type = XkbKeyKeyType(xkb,key,effectiveGroup);
+    type = XkbKeyType(xkb,key,effectiveGroup);
 
     preserve= 0;
     if (type->map) { /* find the column (shift level) within the group */
@@ -468,31 +468,25 @@ gdk_wayland_keymap_translate_keyboard_state (GdkKeymap       *keymap,
 static void
 update_modmap (GdkWaylandKeymap *wayland_keymap)
 {
-  static struct {
+  static const struct {
     const gchar *name;
-    uint32_t atom;
     GdkModifierType mask;
   } vmods[] = {
-    { "Meta", 0, GDK_META_MASK },
-    { "Super", 0, GDK_SUPER_MASK },
-    { "Hyper", 0, GDK_HYPER_MASK },
-    { NULL, 0, 0 }
+    { "Meta", GDK_META_MASK },
+    { "Super", GDK_SUPER_MASK },
+    { "Hyper", GDK_HYPER_MASK },
   };
 
   gint i, j, k;
-
-  if (!vmods[0].atom)
-    for (i = 0; vmods[i].name; i++)
-      vmods[i].atom = xkb_intern_atom(vmods[i].name);
 
   for (i = 0; i < 8; i++)
     wayland_keymap->modmap[i] = 1 << i;
 
   for (i = 0; i < XkbNumVirtualMods; i++)
     {
-      for (j = 0; vmods[j].atom; j++)
+      for (j = 0; j < G_N_ELEMENTS(vmods); j++)
 	{
-	  if (wayland_keymap->xkb->names->vmods[i] == vmods[j].atom)
+	  if (strcmp(wayland_keymap->xkb->names->vmods[i], vmods[j].name) == 0)
 	    {
 	      for (k = 0; k < 8; k++)
 		{

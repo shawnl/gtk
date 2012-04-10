@@ -17,13 +17,14 @@
 
 #include "config.h"
 
-#include <wayland-egl.h>
 
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
 #include <unistd.h>
 #include <fcntl.h>
+
+#include <wayland-egl.h>
 
 #include <glib.h>
 #include "gdkwayland.h"

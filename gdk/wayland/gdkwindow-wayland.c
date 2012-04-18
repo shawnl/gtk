@@ -444,6 +444,7 @@ create_shm_buffer (struct wl_shm  *shm,
 {
   char filename[] = "/tmp/wayland-shm-XXXXXX";
   struct wl_buffer *buffer;
+  struct wl_shm_pool *pool;
   int fd, size, stride;
   void *data;
 
@@ -472,11 +473,11 @@ create_shm_buffer (struct wl_shm  *shm,
       return NULL;
   }
 
-  buffer = wl_shm_create_buffer (shm, fd,
-                                 width, height,
-                                 stride, format);
-
+  pool = wl_shm_create_pool (shm, fd, size);
   close (fd);
+
+  buffer = wl_shm_pool_create_buffer(pool, 0, width, height, stride, format);
+  wl_shm_pool_destroy(pool);
 
   *data_out = data;
   *buf_length = size;
@@ -652,9 +653,16 @@ gdk_wayland_window_map (GdkWindow *window)
 }
 
 static void
+shell_surface_handle_ping(void *data,
+			  struct wl_shell_surface *shell_surface,
+			  uint32_t serial)
+{
+	wl_shell_surface_pong(shell_surface, serial);
+}
+
+static void
 shell_surface_handle_configure(void *data,
                                struct wl_shell_surface *shell_surface,
-                               uint32_t time,
                                uint32_t edges,
                                int32_t width,
                                int32_t height)
@@ -686,6 +694,7 @@ shell_surface_popup_done (void                    *data,
 }
 
 static const struct wl_shell_surface_listener shell_surface_listener = {
+  shell_surface_handle_ping,
   shell_surface_handle_configure,
   shell_surface_popup_done
 };
@@ -1466,9 +1475,6 @@ gdk_wayland_window_process_updates_recurse (GdkWindow      *window,
                                             cairo_region_t *region)
 {
   GdkWindowImplWayland *impl = GDK_WINDOW_IMPL_WAYLAND (window->impl);
-#ifndef GDK_WAYLAND_USE_EGL
-  GdkWaylandCairoSurfaceData *data = NULL;
-#endif
   cairo_rectangle_int_t rect;
   int i, n;
 
@@ -1477,21 +1483,10 @@ gdk_wayland_window_process_updates_recurse (GdkWindow      *window,
   if (impl->cairo_surface)
     gdk_wayland_window_attach_image (window);
 
-#ifndef GDK_WAYLAND_USE_EGL
-  if (impl->server_surface)
-    data = cairo_surface_get_user_data (impl->server_surface,
-                                        &gdk_wayland_cairo_key);
-#endif
-
   n = cairo_region_num_rectangles(region);
   for (i = 0; i < n; i++)
     {
       cairo_region_get_rectangle (region, i, &rect);
-#ifndef GDK_WAYLAND_USE_EGL
-      if (data && data->buffer)
-        wl_buffer_damage (data->buffer,
-                          rect.x, rect.y, rect.width, rect.height);
-#endif
       wl_surface_damage (impl->surface,
                          rect.x, rect.y, rect.width, rect.height);
     }

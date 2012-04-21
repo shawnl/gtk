@@ -64,6 +64,9 @@ struct _GdkWaylandDevice
   struct wl_data_device *data_device;
   int32_t surface_x, surface_y;
   uint32_t time;
+  uint32_t button_serial;
+  uint32_t enter_serial;
+  uint32_t key_serial;
   GdkWindow *pointer_grab_window;
   uint32_t pointer_grab_time;
   guint32 repeat_timer;
@@ -340,6 +343,12 @@ _gdk_wayland_device_get_device (GdkDevice *device)
   return GDK_DEVICE_CORE (device)->device->device;
 }
 
+uint32_t
+_gdk_wayland_device_get_button_serial (GdkDevice *device)
+{
+  return GDK_DEVICE_CORE (device)->device->button_serial;
+}
+
 static void
 input_handle_motion(void *data, struct wl_input_device *input_device,
 		    uint32_t time, int32_t sx, int32_t sy)
@@ -396,6 +405,7 @@ input_handle_button(void *data, struct wl_input_device *input_device,
   }
 
   device->time = time;
+  device->button_serial = serial;
   event = gdk_event_new (state ? GDK_BUTTON_PRESS : GDK_BUTTON_RELEASE);
   event->button.window = g_object_ref (device->pointer_focus);
   gdk_event_set_device (event, device->pointer);
@@ -588,6 +598,7 @@ input_handle_key(void *data, struct wl_input_device *input_device,
   GdkWaylandDevice *device = data;
 
   device->repeat_count = 0;
+  device->key_serial = serial;
   deliver_key_event (data, time, key, state);
 }
 
@@ -616,13 +627,13 @@ input_handle_axis(void *data, struct wl_input_device *input_device,
 static void
 input_handle_pointer_enter(void *data,
 			   struct wl_input_device *input_device,
-			   uint32_t time, struct wl_surface *surface,
+			   uint32_t serial, struct wl_surface *surface,
 			   int32_t sx, int32_t sy)
 {
   GdkWaylandDevice *device = data;
   GdkEvent *event;
 
-  device->time = time;
+  device->enter_serial = serial;
 
       device->pointer_focus = wl_surface_get_user_data(surface);
       g_object_ref(device->pointer_focus);
@@ -631,7 +642,7 @@ input_handle_pointer_enter(void *data,
       event->crossing.window = g_object_ref (device->pointer_focus);
       gdk_event_set_device (event, device->pointer);
       event->crossing.subwindow = NULL;
-      event->crossing.time = time;
+      event->crossing.time = device->time;
       event->crossing.x = (gdouble) sx;
       event->crossing.y = (gdouble) sy;
 

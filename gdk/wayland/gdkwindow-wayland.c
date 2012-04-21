@@ -1396,7 +1396,8 @@ gdk_wayland_window_begin_resize_drag (GdkWindow     *window,
 
   wl_shell_surface_resize (impl->shell_surface,
                            _gdk_wayland_device_get_device (device),
-                           timestamp, grab_type);
+                           _gdk_wayland_device_get_button_serial (device),
+                           grab_type);
 
   /* This is needed since Wayland will absorb all the pointer events after the
    * above function - FIXME: Is this always safe..?
@@ -1421,7 +1422,8 @@ gdk_wayland_window_begin_move_drag (GdkWindow *window,
   impl = GDK_WINDOW_IMPL_WAYLAND (window->impl);
 
   wl_shell_surface_move (impl->shell_surface,
-                         _gdk_wayland_device_get_device (device), timestamp);
+                         _gdk_wayland_device_get_device (device),
+			 _gdk_wayland_device_get_button_serial (device));
 
   /* This is needed since Wayland will absorb all the pointer events after the
    * above function - FIXME: Is this always safe..?

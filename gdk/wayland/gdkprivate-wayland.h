@@ -124,6 +124,7 @@ GdkDeviceManager *_gdk_wayland_device_manager_new (GdkDisplay *display);
 void              _gdk_wayland_device_manager_add_device (GdkDeviceManager *device_manager,
 							  struct wl_input_device *device);
 struct wl_input_device *_gdk_wayland_device_get_device (GdkDevice *device);
+uint32_t _gdk_wayland_device_get_button_serial (GdkDevice *device);
 
 void     _gdk_wayland_display_deliver_event (GdkDisplay *display, GdkEvent *event);
 GSource *_gdk_wayland_display_event_source_new (GdkDisplay *display);

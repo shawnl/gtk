@@ -164,6 +164,9 @@ gdk_device_core_set_window_cursor (GdkDevice *device,
       /* FIXME: Is this the best sensible default ? */
       cursor = _gdk_wayland_display_get_cursor_for_type (device->display,
                                                          GDK_LEFT_PTR);
+      /* above returns NULL if it can't find the specified cursor */
+      if (!cursor)
+        return;
     }
 
   buffer = _gdk_wayland_cursor_get_buffer(cursor, &x, &y);
